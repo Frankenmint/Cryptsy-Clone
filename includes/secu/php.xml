@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rules>
+<entry id="1">
+	<type>ini</type>
+	<key>upload_max_filesize</key>
+	<value op="lt">4194304</value>
+	<description>Sets the maximum size of an uploaded file. Reduce this to mitigate the risk of DOS attacks.</description>
+</entry>
+<entry id="29">
+	<type>ini</type>
+	<key>upload_max_filesize</key>
+	<value op="lt" type="key">memory_limit</value>
+	<description>The maximum size of an uploaded file should be able to fit within the avaliable memory limit.</description>
+</entry>
+<entry id="30">
+	<type>ini</type>
+	<key>post_max_size</key>
+	<value op="lt" type="key">memory_limit</value>
+	<description>The maximum post size of data posted to the server should be within the avaliable memory limit.</description>
+</entry>
+<entry id="32">
+	<type>ini</type>
+	<key>always_populate_raw_post_data</key>	
+	<value op="eq">0</value>
+	<description>This does not need to be used. The preferred method for accessing the raw POST data is php://input.</description>
+</entry>
+<entry id="33">
+	<type>ini</type>
+	<key>magic_quotes_gpc</key>	
+	<value op="eq">0</value>
+	<description>Sets magic_quotes state for GPC (GET PUT COOKIE) data.  Relying on this feature is highly discouraged.</description>
+	<version op="before">50300</version>
+	<url>http://www.php.net/manual/en/info.configuration.php#ini.magic-quotes-gpc</url>
+</entry>
+<entry id="34">
+	<type>ini</type>
+	<key>magic_quotes_runtime</key>	
+	<value op="eq">0</value>
+	<description>Sets magic_quotes state for data from external sources.  Relying on this feature is highly discouraged.</description>
+	<version op="before">50300</version>
+	<url>http://www.php.net/manual/en/info.configuration.php#ini.magic-quotes-runtime</url>
+</entry>
+<entry id="35">
+	<type>ini</type>
+	<key>safe_mode</key>	
+	<value op="eq">0</value>
+	<description>This feature has been DEPRECATED as of PHP 5.3.0. Relying on this feature is highly discouraged.</description>
+	<version op="before">50300</version>
+</entry>
+<entry id="36">
+	<type>ini</type>
+	<key>memory_limit</key>
+	<value op="lt">16777216</value>
+	<description>The maximum memory limit for each script should be 16M or less.</description>
+</entry>
+<entry id="5">
+	<type>ini</type>
+	<key>upload_max_filesize</key>	
+	<value op="lt" type="key">post_max_size</value>
+	<description>The maximum upload file size should be less than or equal to the maximum post size.</description>
+</entry>
+<entry id="2">
+	<type>ini</type>
+	<key>max_file_uploads</key>
+	<value op="lt">10</value>
+	<description>The maximum mumber of files that can be uploaded in 1 go.</description>
+</entry>
+<entry id="3">
+	<type>ini</type>
+	<key>file_uploads</key>
+	<value op="eq">0</value>
+	<description>This may be impractical but if not needed file uploading should be disabled.</description>
+</entry>
+<entry id="4">
+	<type>ini</type>
+	<key>post_max_size</key>	
+	<value op="lt">4194304</value>
+	<description>The maximum post size should as small as reasonably possible to mitigate the risk of DOS attacks.</description>
+</entry>
+<entry id="6">
+	<type>ini</type>
+	<key>register_long_arrays</key>	
+	<value op="eq">0</value>
+	<description>Populates HTTP_*_VARS which should no longer be used.</description>
+	<version op="before">50300</version>
+</entry>
+<entry id="7">
+	<type>ini</type>
+	<key>register_globals</key>	
+	<value op="eq">0</value>
+	<description>Highly dangerous feature enabling variables to be defined in scripts from the GPC paramaters. This should be always be turned off.</description>	
+	<version op="before">50300</version>
+</entry>
+<entry id="8">
+	<type>ini</type>
+	<key>session.hash_function</key>	
+	<value op="eq">1</value>
+	<description>MD5 should be replaced with SHA-160 as it is a more complex and secure hashing algorithm.</description>
+	<version op="after">50000</version>
+</entry>
+<entry id="9">
+	<type>ini</type>
+	<key>session.hash_bits_per_character</key>	
+	<value op="gt">5</value>
+	<description>The number of bits encoded per character of the session key.</description>
+	<version op="after">50000</version>
+</entry>
+<entry id="10">
+	<type>ini</type>
+	<key>session.entropy_file</key>	
+	<value op="ne" net="">/dev/random</value>
+	<description>Provides a random seed for generating the session.</description>
+</entry>
+<entry id="11">
+	<type>ini</type>
+	<key>session.entropy_length</key>	
+	<value op="gt">32</value>
+	<description>The number of bytes to read for gathering entropy for session generation.</description>
+</entry>
+<entry id="12">
+	<type>ini</type>
+	<key>session.name</key>	
+	<value op="ne" net="PHPSESSID">Custom String</value>
+	<description>The name given to the PHP Session. It is recomended this be changed from the default.</description>
+</entry>
+<entry id="14">
+	<type>ini</type>
+	<key>session.save_path</key>	
+	<value op="ne" net="/tmp" notblank="true">/custom/location</value>
+	<description>The save path for the session should be changed from the default /tmp.</description>
+</entry>
+<entry id="15">
+	<type>ini</type>
+	<key>session.use_trans_sid</key>	
+	<value op="eq">0</value>
+	<description>Sessions should not be allowed in GET paramaters.</description>
+</entry>
+<entry id="18">
+	<type>ini</type>
+	<key>display_errors</key>	
+	<value op="eq">0</value>
+	<description>Error messages should be suppressed</description>
+</entry>
+<entry id="19">
+	<type>ini</type>
+	<key>allow_url_fopen</key>	
+	<value op="eq">0</value>
+	<description>Remote files should not be accessable using fopen.</description>
+</entry>
+<entry id="20">
+	<type>ini</type>
+	<key>allow_url_include</key>	
+	<value op="eq">0</value>
+	<description>You should not be able to include remote scripts using include.</description>
+</entry>
+<entry id="31">
+	<type>ini</type>
+	<key>session.cookie_httponly</key>	
+	<value op="eq">1</value>
+	<description>Cookies must be httponly by default</description>
+	<version op="after">50200</version>
+</entry>
+<entry id="20">
+	<type>ini</type>
+	<key>open_basedir</key>	
+	<value op="ne" net="/" notblank="true">/the/webroot</value>
+	<description>Limit the files that can be opened by PHP to the webroot.</description>
+</entry>
+<entry id="32">
+	<type>ini</type>
+	<key>upload_tmp_dir</key>	
+	<value op="ne" net="/tmp" notblank="true">/custom/location</value>
+	<description>Change the location of where files are initally uploaded to</description>
+</entry>
+<entry id="21">
+	<type>ini</type>
+	<key>max_execution_time</key>	
+	<value op="lt">20</value>
+	<description>Execution time should be limited to 20 seconds or less.</description>
+</entry>
+<entry id="22">
+	<type>ini</type>
+	<key>max_input_nesting_level</key>	
+	<value op="lt">32</value>
+	<description>Maximum level of nesting of objects 32 is sufficent.</description>
+</entry>
+<entry id="23">
+	<type>ini</type>
+	<key>enable_dl</key>	
+	<value op="eq">0</value>
+	<description>Disable loading of dynamic extensions.</description>
+</entry>
+<entry id="24">
+	<type>ini</type>
+	<key>display_startup_errors</key>	
+	<value op="eq">0</value>
+	<description>Startup errors should be suppressed.</description>
+</entry>
+<entry id="25">
+	<type>ini</type>
+	<key>log_errors</key>	
+	<value op="eq">1</value>
+	<description>All errors generated by PHP should be logged to a file.</description>
+</entry>
+<entry id="26">
+	<type>ini</type>
+	<key>log_errors_max_len</key>	
+	<value op="gt">2048</value>
+	<description>At least 2048 characters of the error message should be stored in the error log.</description>
+</entry>
+<entry id="27">
+	<type>ini</type>
+	<key>error_log</key>	
+	<value op="ne" net="">/custom/location</value>
+	<description>Should be set to the location of the php error log.</description>
+</entry>
+<entry id="28">
+	<type>const</type>
+	<key>LIBXML_NOENT</key>	
+	<value op="eq">0</value>
+	<description>External entities should be disabled for XML parsing</description>
+</entry>
+<entry id="37">
+	<type>ini</type>
+	<key>session.use_only_cookies</key>	
+	<value op="eq">1</value>
+	<description>Session variables should only be passed in cookies.</description>
+</entry>
+<entry id="29">
+	<type>const</type>
+	<key>LIBXML_NONET</key>	
+	<value op="eq">0</value>
+	<description>Network access for XML parsers should be disabled.</description>
+</entry>
+<entry id="38">
+	<type>disable_functions</type>
+	<list>
+		<function>fsocket_open</function>
+		<function>pack</function>
+		<function>escapeshellarg</function>
+		<function>escapeshellcmd</function>
+		<function>exec</function>
+		<function>passthru</function>
+		<function>proc_close</function>
+		<function>php_uname</function>
+		<function>getmyuid</function>
+		<function>getmypid</function>
+		<function>passthru</function>
+		<function>leak</function>
+		<function>listen</function>
+		<function>diskfreespace</function>
+		<function>tmpfile</function>
+		<function>link</function>
+		<function>ignore_user_abort</function>
+		<function>set_time_limit</function>
+		<function>limit</function>
+		<function>exec</function>
+		<function>highlight_file</function>
+		<function>show_source</function>
+		<function>fpaththru</function>
+		<function>virtual</function>
+		<function>posix_ctermid</function>
+		<function>posix_getcwd</function>
+		<function>posix_getegid</function>
+		<function>posix_geteuid</function>
+		<function>posix_getgid</function>
+		<function>posix_getgrgid</function>
+		<function>posix_getgrnam</function>
+		<function>posix_getgroups</function>
+		<function>posix_getlogin</function>
+		<function>posix_getpgid</function>
+		<function>posix_getpgrp</function>
+		<function>posix_getpid</function>
+		<function>posix</function>
+		<function>posix_getpwnam</function>
+		<function>posix_getpwuid</function>
+		<function>posix_getrlimit</function>
+		<function>posix_getsid</function>
+		<function>posix_getuid</function>
+		<function>posix_isatty</function>
+		<function>posix_kill</function>
+		<function>posix_mkfifo</function>
+		<function>posix_setegid</function>
+		<function>posix_seteuid</function>
+		<function>posix_setgid</function>
+		<function>posix_setpgid</function>
+		<function>posix_setsid</function>
+		<function>posix_setuid</function>
+		<function>posix_times</function>
+		<function>posix_ttyname</function>
+		<function>posix_uname</function>
+		<function>proc_open</function>
+		<function>proc_close</function>
+		<function>proc_get_status</function>
+		<function>proc_nice</function>
+		<function>proc_terminate</function>
+		<function>phpinfo</function>
+		<function>proc_open</function>
+		<function>shell_exec</function>
+		<function>system</function>
+		<function>set_time_limit</function>
+		<function>ini_alter</function>
+		<function>dl</function>
+		<function>popen</function>
+		<function>parse_ini_file</function>
+	</list>
+</entry>
+</rules>

