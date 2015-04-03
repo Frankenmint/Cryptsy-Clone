@@ -10,7 +10,7 @@ Litecoin: LNAXMC2UKpey1ZgD4QXs26jJPTdYj3xryu
 
 Copyright (c) 2014-2015 Adytech Developer Copyright (c) 2014 Cryptsy Developer
 
-#What is Litecoin?
+#What is Cryptsy Clone?
 
 
 
