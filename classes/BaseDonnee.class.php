@@ -20,7 +20,7 @@ class BaseDonnee
            //LOCAL
             $dsn = "mysql:host=localhost;dbname=crypto";
             $usr = "root";
-            $pass = "IOJIOjoijipodfhzeoufhozeifh584848";
+            $pass = "pass";
 
             $options[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
             $bdd = new PDO($dsn, $usr, $pass);
